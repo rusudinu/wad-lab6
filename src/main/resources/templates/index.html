@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Search Studio</title>
+		<link rel="stylesheet" href="/css/app.css" />
+	</head>
+	<body>
+		<div class="ambient">
+			<span class="orb orb-a"></span>
+			<span class="orb orb-b"></span>
+			<span class="orb orb-c"></span>
+		</div>
+
+		<main class="page">
+			<header class="hero">
+				<h1>Postgres and Elasticsearch side by side.</h1>
+				<form class="search-bar" role="search">
+					<input type="search" name="q" placeholder="Search for a title, tag, or phrase" />
+					<button type="submit">Search</button>
+				</form>
+			</header>
+
+			<section class="grid">
+				<article class="panel">
+					<div class="panel-head">
+						<h2>Postgres Search</h2>
+						<span class="chip">Relational</span>
+					</div>
+					<ul class="results"></ul>
+				</article>
+
+				<article class="panel">
+					<div class="panel-head">
+						<h2>Elasticsearch Search</h2>
+						<span class="chip">Relevance</span>
+					</div>
+					<ul class="results"></ul>
+				</article>
+			</section>
+		</main>
+	</body>
+</html>

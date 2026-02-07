@@ -1,0 +1,49 @@
+@startuml
+
+package "Search Laboratory Domain Model" {
+
+  class Product {
+    +Long id
+    +String title
+    +String description
+    +BigDecimal price
+    +LocalDateTime createdAt
+  }
+
+  class Category {
+    +Long id
+    +String name
+    +String description
+  }
+
+  class Tag {
+    +Long id
+    +String name
+  }
+
+  class Review {
+    +Long id
+    +String reviewerName
+    +Integer rating
+    +String comment
+    +LocalDateTime createdAt
+  }
+
+  class Manufacturer {
+    +Long id
+    +String name
+    +String country
+  }
+
+}
+
+' =========================
+' Relationships
+' =========================
+
+Category "1" -- "0..*" Product : categorizes
+Manufacturer "1" -- "0..*" Product : produces
+Product "1" -- "0..*" Review : has
+Product "0..*" -- "0..*" Tag : labeled with
+
+@enduml
