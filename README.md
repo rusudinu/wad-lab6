@@ -8,7 +8,18 @@ Based on the following domain model:
 Use:
 1. Spring Data JPA for PostgreSQL access
 2. Spring Data Elasticsearch
-3. Fill in the missing code to make the application work.
+3. Implement the missing code to make the application work:
+   - Create JPA entities and repositories for Product, Category, Tag, Review, and Manufacturer with the relationships from the model.
+   - Create an Elasticsearch document/index mapping for Product (including category, manufacturer, tags, and reviews) and an Elasticsearch repository.
+   - Implement `PostgresSearchService` and `ElasticsearchSearchService` to execute searches and map results to the provided DTOs.
+   - The search query must match (case-insensitive, partial match is fine) across exactly these fields:
+     - Product.title
+     - Product.description
+     - Category.name
+     - Manufacturer.name
+     - Tag.name
+     - Review.reviewerName
+     - Review.comment
 4. Display:
 - Search results
 - Execution time

@@ -16,8 +16,14 @@
 		<main class="page">
 			<header class="hero">
 				<h1>Postgres and Elasticsearch side by side.</h1>
-				<form class="search-bar" role="search">
-					<input type="search" name="q" placeholder="Search for a title, tag, or phrase" />
+				<form class="search-bar" role="search" id="search-form">
+					<input
+						type="search"
+						name="q"
+						id="search-input"
+						placeholder="Search for a title, tag, or phrase"
+						autocomplete="off"
+					/>
 					<button type="submit">Search</button>
 				</form>
 			</header>
@@ -28,7 +34,13 @@
 						<h2>Postgres Search</h2>
 						<span class="chip">Relational</span>
 					</div>
-					<ul class="results"></ul>
+					<div class="panel-meta">
+						<span class="metric" data-role="postgres-time">-- ms</span>
+						<span class="metric" data-role="postgres-count">0 results</span>
+					</div>
+					<ul class="results" data-role="postgres-results">
+						<li class="empty">No results yet.</li>
+					</ul>
 				</article>
 
 				<article class="panel">
@@ -36,9 +48,17 @@
 						<h2>Elasticsearch Search</h2>
 						<span class="chip">Relevance</span>
 					</div>
-					<ul class="results"></ul>
+					<div class="panel-meta">
+						<span class="metric" data-role="elasticsearch-time">-- ms</span>
+						<span class="metric" data-role="elasticsearch-count">0 results</span>
+					</div>
+					<ul class="results" data-role="elasticsearch-results">
+						<li class="empty">No results yet.</li>
+					</ul>
 				</article>
 			</section>
 		</main>
+
+		<script src="/js/search.js" defer></script>
 	</body>
 </html>
