@@ -12,6 +12,8 @@ public class ElasticsearchSearchService {
 
 	public SearchResponseDto search(String query) {
 		long started = System.nanoTime();
+		// TODO: Implement the Elasticsearch query and map hits to ProductDto + relevance score.
+		// TODO: Ensure the query matches the required fields (title/description/category/manufacturer/tag/review).
 		List<SearchHitDto> results = List.of();
 		long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
 		return new SearchResponseDto(query, elapsedMs, results);
