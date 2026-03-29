@@ -1,9 +1,35 @@
 @startuml
 
-package "Search Laboratory Domain Model" {
+package "Stage 1 — Postgres (Books)" {
+
+  class Book {
+    +Long id
+    +String title
+    +String description
+    +Integer publicationYear
+    +LocalDateTime createdAt
+  }
+
+  class Author {
+    +Long id
+    +String name
+    +String country
+  }
+
+  class Genre {
+    +Long id
+    +String name
+    +String description
+  }
+
+  Author "1" -- "0..*" Book : writes
+  Genre "1" -- "0..*" Book : categorizes
+}
+
+package "Stage 2 — Elasticsearch (Products)" {
 
   class Product {
-    +Long id
+    +String id
     +String title
     +String description
     +BigDecimal price
@@ -11,39 +37,29 @@ package "Search Laboratory Domain Model" {
   }
 
   class Category {
-    +Long id
     +String name
     +String description
   }
 
-  class Tag {
-    +Long id
-    +String name
-  }
-
-  class Review {
-    +Long id
-    +String reviewerName
-    +Integer rating
-    +String comment
-    +LocalDateTime createdAt
-  }
-
   class Manufacturer {
-    +Long id
     +String name
     +String country
   }
 
+  class Tag {
+    +String name
+  }
+
+  class Review {
+    +String reviewerName
+    +Integer rating
+    +String comment
+  }
+
+  Category "1" -- "0..*" Product : categorizes
+  Manufacturer "1" -- "0..*" Product : produces
+  Product "1" -- "0..*" Review : has
+  Product "0..*" -- "0..*" Tag : labeled with
 }
-
-' =========================
-' Relationships
-' =========================
-
-Category "1" -- "0..*" Product : categorizes
-Manufacturer "1" -- "0..*" Product : produces
-Product "1" -- "0..*" Review : has
-Product "0..*" -- "0..*" Tag : labeled with
 
 @enduml

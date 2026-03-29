@@ -15,13 +15,13 @@
 
 		<main class="page">
 			<header class="hero">
-				<h1>Postgres and Elasticsearch side by side.</h1>
+				<h1>Search Lab: Two Stages</h1>
 				<form class="search-bar" role="search" id="search-form">
 					<input
 						type="search"
 						name="q"
 						id="search-input"
-						placeholder="Search for a title, tag, or phrase"
+						placeholder="Search books and products..."
 						autocomplete="off"
 					/>
 					<button type="submit">Search</button>
@@ -31,8 +31,8 @@
 			<section class="grid">
 				<article class="panel">
 					<div class="panel-head">
-						<h2>Postgres Search</h2>
-						<span class="chip">Relational</span>
+						<h2>Stage 1 &mdash; Postgres</h2>
+						<span class="chip">Books / Authors / Genres</span>
 					</div>
 					<div class="panel-meta">
 						<span class="metric" data-role="postgres-time">-- ms</span>
@@ -45,8 +45,8 @@
 
 				<article class="panel">
 					<div class="panel-head">
-						<h2>Elasticsearch Search</h2>
-						<span class="chip">Relevance</span>
+						<h2>Stage 2 &mdash; Elasticsearch</h2>
+						<span class="chip">Products / Categories / Tags</span>
 					</div>
 					<div class="panel-meta">
 						<span class="metric" data-role="elasticsearch-time">-- ms</span>

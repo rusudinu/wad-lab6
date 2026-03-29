@@ -1,4 +1,4 @@
-package com.rusudinu.wad_lab6.web;
+package com.rusudinu.wad_lab6;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

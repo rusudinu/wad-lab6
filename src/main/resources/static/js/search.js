@@ -26,9 +26,7 @@ function buildPanel(key, url, showScore) {
 	const list = document.querySelector(`[data-role="${key}-results"]`);
 	const time = document.querySelector(`[data-role="${key}-time"]`);
 	const count = document.querySelector(`[data-role="${key}-count"]`);
-	if (!list || !time || !count) {
-		return null;
-	}
+	if (!list || !time || !count) return null;
 	return { key, url, showScore, list, time, count };
 }
 
@@ -56,12 +54,8 @@ async function loadResults(panel, query) {
 }
 
 async function fetchJson(url) {
-	const response = await fetch(url, {
-		headers: { Accept: "application/json" },
-	});
-	if (!response.ok) {
-		throw new Error(`Request failed: ${response.status}`);
-	}
+	const response = await fetch(url, { headers: { Accept: "application/json" } });
+	if (!response.ok) throw new Error(`Request failed: ${response.status}`);
 	return response.json();
 }
 
@@ -74,44 +68,41 @@ function renderPanel(panel, data) {
 		setPanelMessage(panel, "No results yet.", "empty");
 		return;
 	}
-
-	results.forEach((hit) => {
-		panel.list.appendChild(renderResult(panel, hit));
-	});
+	results.forEach((hit) => panel.list.appendChild(renderResult(panel, hit)));
 }
 
 function renderResult(panel, hit) {
-	const product = hit?.product ?? {};
 	const item = document.createElement("li");
 	item.className = "result-card";
 
+	if (panel.key === "postgres") {
+		renderBookResult(item, panel, hit);
+	} else {
+		renderProductResult(item, panel, hit);
+	}
+	return item;
+}
+
+function renderBookResult(item, panel, hit) {
+	const book = hit?.book ?? {};
 	const titleRow = document.createElement("div");
 	titleRow.className = "result-title";
 	const title = document.createElement("span");
-	title.textContent = product.title || "Untitled product";
+	title.textContent = book.title || "Untitled book";
 	titleRow.appendChild(title);
-
-	if (panel.showScore) {
-		const score = document.createElement("span");
-		score.className = "score";
-		if (typeof hit?.relevanceScore === "number") {
-			score.textContent = `Score ${hit.relevanceScore.toFixed(3)}`;
-		} else {
-			score.textContent = "Score --";
-		}
-		titleRow.appendChild(score);
-	}
-
 	item.appendChild(titleRow);
 
-	if (product.description) {
-		const description = document.createElement("p");
-		description.className = "result-desc";
-		description.textContent = product.description;
-		item.appendChild(description);
+	if (book.description) {
+		const desc = document.createElement("p");
+		desc.className = "result-desc";
+		desc.textContent = book.description;
+		item.appendChild(desc);
 	}
 
-	const meta = buildMeta(product);
+	const meta = [];
+	if (book.author?.name) meta.push(`Author: ${book.author.name}`);
+	if (book.genre?.name) meta.push(`Genre: ${book.genre.name}`);
+	if (book.publicationYear) meta.push(`Year: ${book.publicationYear}`);
 	if (meta.length > 0) {
 		const metaRow = document.createElement("div");
 		metaRow.className = "result-meta";
@@ -123,36 +114,56 @@ function renderResult(panel, hit) {
 		});
 		item.appendChild(metaRow);
 	}
-
-	return item;
 }
 
-function buildMeta(product) {
+function renderProductResult(item, panel, hit) {
+	const product = hit?.product ?? {};
+	const titleRow = document.createElement("div");
+	titleRow.className = "result-title";
+	const title = document.createElement("span");
+	title.textContent = product.title || "Untitled product";
+	titleRow.appendChild(title);
+
+	if (panel.showScore && typeof hit?.relevanceScore === "number") {
+		const score = document.createElement("span");
+		score.className = "score";
+		score.textContent = `Score ${hit.relevanceScore.toFixed(3)}`;
+		titleRow.appendChild(score);
+	}
+	item.appendChild(titleRow);
+
+	if (product.description) {
+		const desc = document.createElement("p");
+		desc.className = "result-desc";
+		desc.textContent = product.description;
+		item.appendChild(desc);
+	}
+
 	const meta = [];
-	if (product.category?.name) {
-		meta.push(`Category: ${product.category.name}`);
+	if (product.category?.name) meta.push(`Category: ${product.category.name}`);
+	if (product.manufacturer?.name) meta.push(`Maker: ${product.manufacturer.name}`);
+	if (product.price != null) meta.push(`Price: $${product.price}`);
+	if (product.tags?.length) meta.push(...product.tags.map(t => `#${t.name}`));
+	if (meta.length > 0) {
+		const metaRow = document.createElement("div");
+		metaRow.className = "result-meta";
+		meta.forEach((value) => {
+			const chip = document.createElement("span");
+			chip.className = "meta-chip";
+			chip.textContent = value;
+			metaRow.appendChild(chip);
+		});
+		item.appendChild(metaRow);
 	}
-	if (product.manufacturer?.name) {
-		meta.push(`Maker: ${product.manufacturer.name}`);
-	}
-	if (product.price != null) {
-		meta.push(`Price: ${product.price}`);
-	}
-	return meta;
 }
 
 function formatTime(value) {
-	if (typeof value !== "number" || Number.isNaN(value)) {
-		return "-- ms";
-	}
+	if (typeof value !== "number" || Number.isNaN(value)) return "-- ms";
 	return `${Math.max(0, Math.round(value))} ms`;
 }
 
 function formatCount(count) {
-	if (count === 1) {
-		return "1 result";
-	}
-	return `${count} results`;
+	return count === 1 ? "1 result" : `${count} results`;
 }
 
 function setPanelMessage(panel, message, className) {
