@@ -1,59 +1,81 @@
-# Wad Lab 6 - Search with Postgres and Elasticsearch
+# WAD Lab 6 — Search with Postgres and Elasticsearch
 
-## Laboratory request
+## Domain Model
 
-Based on the following domain model:
 ![Domain model](img/domain.png)
 
-Use:
-1. Spring Data JPA for PostgreSQL access
-2. Spring Data Elasticsearch
-3. Implement the missing code to make the application work:
-   - Create JPA entities and repositories for Product, Category, Tag, Review, and Manufacturer with the relationships from the model.
-   - Create an Elasticsearch document/index mapping for Product (including category, manufacturer, tags, and reviews) and an Elasticsearch repository.
-   - Implement `PostgresSearchService` and `ElasticsearchSearchService` to execute searches and map results to the provided DTOs.
-   - The search query must match (case-insensitive, partial match is fine) across exactly these fields:
-     - Product.title
-     - Product.description
-     - Category.name
-     - Manufacturer.name
-     - Tag.name
-     - Review.reviewerName
-     - Review.comment
-4. Display:
-- Search results
-- Execution time
-- Relevance score (where applicable)
+This lab has **two stages**, each using a different search technology and a different set of entities.
 
-# Helper tutorial
+---
 
-## Start the services (Postgres and Elasticsearch)
-From the repo root:
+## Stage 1 — Postgres (package `first`)
+
+**Entities:** `Book`, `Author`, `Genre`
+
+Using Spring Data JPA and PostgreSQL, implement the missing code:
+
+1. **`BookRepository`** — complete the JPQL `@Query` in `searchBooks()`.
+   Add a `WHERE` clause that matches the query (case-insensitive, partial match) across:
+   - `Book.title`
+   - `Book.description`
+   - `Author.name`
+   - `Genre.name`
+
+2. **`BookSearchService`**
+   - In `search()`: call the repository, map each `Book` to a `BookSearchHitDto`, and collect the results.
+   - In `toHit()`: convert a `Book` entity to `BookDto` (including `AuthorDto` and `GenreDto`).
+
+3. **`BookSearchController`** — delegate to `BookSearchService` and return the response.
+
+---
+
+## Stage 2 — Elasticsearch (package `second`)
+
+**Entities:** `ProductDocument` (with nested `CategoryInfo`, `ManufacturerInfo`, `TagInfo`, `ReviewInfo`)
+
+Using Spring Data Elasticsearch, implement the missing code:
+
+1. **`ProductSearchService`**
+   - Build a `NativeQuery` with a `bool` → `should` combining:
+     - A `multi_match` on `title` (boost ×3), `description` (boost ×2), `category.name`, `manufacturer.name`
+     - A `nested` query on path `tags` matching `tags.name`
+     - A `nested` query on path `reviews` matching `reviews.reviewerName` and `reviews.comment`
+   - Map each `SearchHit<ProductDocument>` to a `ProductSearchHitDto` (use `hit.getScore()` for relevance).
+   - In `toDto()`: convert the document to `ProductDto`, handling nulls gracefully.
+
+2. **`ProductSearchController`** — delegate to `ProductSearchService` and return the response.
+
+---
+
+## Running the Lab
+
+### Start the services (Postgres and Elasticsearch)
 ```
 docker compose up -d
 ```
 
-## Stop the services
+### Run the application
+```
+./gradlew bootRun
+```
+
+Then open [http://localhost:8080](http://localhost:8080) and search. The left panel shows Postgres/Book results, the right panel shows Elasticsearch/Product results.
+
+### Stop the services
 ```
 docker compose down
 ```
 
-## Remove data (optional)
+### Remove data (optional)
 ```
 docker compose down -v
 ```
 
-## Connection info
-Postgres:
-- Host: `localhost`
-- Port: `5432`
-- User: `app`
-- Password: `app_password`
-- Database: `app_db`
+## Connection Info
 
-Elasticsearch:
-- Host: `localhost`
-- Port: `9200`
+| Service       | Host        | Port   | Credentials              |
+|---------------|-------------|--------|--------------------------|
+| PostgreSQL    | `localhost` | `5432` | `app` / `app_password`   |
+| Elasticsearch | `localhost` | `9200` | —                        |
 
-## Customize
-Edit `docker-compose.yml` to change ports or credentials.
+Database name: `app_db`. Edit `docker-compose.yml` to change ports or credentials.
