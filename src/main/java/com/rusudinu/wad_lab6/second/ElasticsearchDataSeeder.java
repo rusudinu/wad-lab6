@@ -6,6 +6,8 @@ import com.rusudinu.wad_lab6.second.repository.ProductDocumentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.IndexOperations;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,8 +17,10 @@ import java.util.List;
 public class ElasticsearchDataSeeder {
 
 	@Bean
-	CommandLineRunner seedProducts(ProductDocumentRepository repo) {
+	CommandLineRunner seedProducts(ProductDocumentRepository repo, ElasticsearchOperations elasticsearchOperations) {
 		return args -> {
+			ensureProductsIndexExists(elasticsearchOperations);
+
 			if (repo.count() > 0) return;
 
 			CategoryInfo electronics = category("Electronics", "Electronic devices and gadgets");
@@ -53,6 +57,22 @@ public class ElasticsearchDataSeeder {
 							List.of(review("Frank", 5, "Perfect fit and incredible sound")))
 			));
 		};
+	}
+
+	private void ensureProductsIndexExists(ElasticsearchOperations elasticsearchOperations) {
+		IndexOperations indexOperations = elasticsearchOperations.indexOps(ProductDocument.class);
+		try {
+			indexOperations.createWithMapping();
+		} catch (RuntimeException ex) {
+			if (!isResourceAlreadyExists(ex)) {
+				throw ex;
+			}
+		}
+	}
+
+	private boolean isResourceAlreadyExists(RuntimeException ex) {
+		String message = ex.getMessage();
+		return message != null && message.contains("resource_already_exists_exception");
 	}
 
 	private ProductDocument product(String title, String desc, BigDecimal price,
