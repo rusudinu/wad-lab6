@@ -135,6 +135,14 @@ Using Spring Data Elasticsearch, implement the missing code:
 docker compose up -d
 ```
 
+If Elasticsearch was already running from an older image, recreate its local volume once:
+```
+docker compose stop elasticsearch
+docker compose rm -f elasticsearch
+docker volume rm wad-lab6_elastic_data
+docker compose up -d elasticsearch
+```
+
 ### Run the application
 ```
 ./gradlew bootRun

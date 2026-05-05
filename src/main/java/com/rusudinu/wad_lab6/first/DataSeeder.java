@@ -7,17 +7,18 @@ import com.rusudinu.wad_lab6.first.repository.BookRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 @Configuration
 public class DataSeeder {
 
 	@Bean
-	@Transactional
-	CommandLineRunner seedBooks(BookRepository bookRepository, EntityManager em) {
-		return args -> {
+	CommandLineRunner seedBooks(BookRepository bookRepository, EntityManager em, PlatformTransactionManager transactionManager) {
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		return args -> transactionTemplate.executeWithoutResult(status -> {
 			if (bookRepository.count() > 0) return;
 
 			Genre fiction = createGenre(em, "Fiction", "Literary and general fiction");
@@ -34,7 +35,7 @@ public class DataSeeder {
 			createBook(em, "I, Robot", "A collection of robot stories exploring artificial intelligence", 1950, asimov, sciFi);
 			createBook(em, "Murder on the Orient Express", "A detective mystery set on a famous train", 1934, christie, mystery);
 			createBook(em, "The ABC Murders", "A serial killer mystery solved by Hercule Poirot", 1936, christie, mystery);
-		};
+		});
 	}
 
 	private Genre createGenre(EntityManager em, String name, String description) {
