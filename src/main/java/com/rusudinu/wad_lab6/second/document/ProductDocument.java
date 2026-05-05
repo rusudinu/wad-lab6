@@ -1,5 +1,6 @@
 package com.rusudinu.wad_lab6.second.document;
 
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,7 +32,7 @@ public class ProductDocument {
 	private BigDecimal price;
 
 	@Field(type = FieldType.Date)
-	private LocalDateTime createdAt;
+	private LocalDate createdAt;
 
 	@Field(type = FieldType.Object)
 	private CategoryInfo category;

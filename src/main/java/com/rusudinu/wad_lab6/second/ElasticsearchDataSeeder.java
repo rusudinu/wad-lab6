@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class ElasticsearchDataSeeder {
 		p.setTitle(title);
 		p.setDescription(desc);
 		p.setPrice(price);
-		p.setCreatedAt(LocalDateTime.now());
+		p.setCreatedAt(LocalDate.now());
 		p.setCategory(cat);
 		p.setManufacturer(mfr);
 		p.setTags(tags);
